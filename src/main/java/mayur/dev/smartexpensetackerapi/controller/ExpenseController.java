@@ -8,8 +8,9 @@ import mayur.dev.smartexpensetackerapi.dto.ExpenseResponse;
 import mayur.dev.smartexpensetackerapi.service.ExpenseService;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/expenses")
@@ -22,29 +23,28 @@ public class ExpenseController {
     // 2. Added @Valid to trigger validation rules
     // 3. Switched to Request/Response DTOs
     @PostMapping
-    public ApiResponse<ExpenseResponse> createExpense(@RequestBody @Valid ExpenseRequest expenseRequest){
+    public ApiResponse<ExpenseResponse> createExpense(@RequestBody @Valid ExpenseRequest expenseRequest) {
         ExpenseResponse data = expenseService.createExpense(expenseRequest);
-//        return  expenseService.createExpense(expenseRequest);
+        return ApiResponse.success(data, "Expense created successfully!");
 
-        // Using the @Builder from your ApiResponse class
-        return ApiResponse.<ExpenseResponse>builder()
-                .success(true)
-                .message("Expense created successfully!")
-                .data(data)
-                .timestamp(LocalDateTime.now())
-                .build();
     }
 
     @GetMapping
     public ApiResponse<List<ExpenseResponse>> getAllExpenses() {
         List<ExpenseResponse> data = expenseService.getAllExpenses();
+        return ApiResponse.success(data, "Retrieved " + data.size() + " expenses");
+    }
 
-        return ApiResponse.<List<ExpenseResponse>>builder()
-                .success(true)
-                .message("Retrieved " + data.size() + " expenses")
-                .data(data)
-                .timestamp(LocalDateTime.now())
-                .build();
+    @GetMapping("/total")
+    public ApiResponse<Double> getTotalExpense() {
+        var totalExpense = expenseService.getTotalExpense();
+        return ApiResponse.success(totalExpense, "Retrieved " + totalExpense + " total expense");
+    }
+
+    @GetMapping("/analytics/category")
+    public ApiResponse<Map<String, BigDecimal>> categoryAnalytics() {
+        var categoryAnalytic = expenseService.getCategoryAnalytics();
+        return ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic);
     }
 
 

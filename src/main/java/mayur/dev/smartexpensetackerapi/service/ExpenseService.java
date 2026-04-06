@@ -7,8 +7,11 @@ import mayur.dev.smartexpensetackerapi.entity.Expense;
 import mayur.dev.smartexpensetackerapi.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +27,8 @@ public class ExpenseService {
         expense.setTitle(request.getTitle());
         expense.setAmount(request.getAmount());
         // Set this manually here so the database always has the correct time
-        expense.setCreatedAt(LocalDateTime.now());;
+        expense.setCreatedAt(LocalDateTime.now());
+        ;
 
         Expense saved = expenseRepository.save(expense);
 
@@ -32,10 +36,23 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponse> getAllExpenses() {
-        return expenseRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return expenseRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    public Double getTotalExpense() {
+        return expenseRepository.getTotalExpense();
+    }
+
+    public Map<String, BigDecimal> getCategoryAnalytics() {
+        List<Object[]> data = expenseRepository.getCategoryWiseExpense();
+
+        Map<String, BigDecimal> result = new HashMap<>();
+
+        for (Object[] row : data) {
+            result.put((String) row[0], (BigDecimal) row[1]);
+        }
+
+        return result;
     }
 
 //    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
