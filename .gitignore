@@ -33,9 +33,7 @@ build/
 .vscode/
 
 
-# Environment / secrets
-.env
-*.env.local
+### Spring Boot Config ###
+application.yaml
 application.yml
-application-prod.yml
-application-secrets.yml
+application.properties
