@@ -1,10 +1,13 @@
 package mayur.dev.smartexpensetackerapi.expense.service;
 
 import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
 import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
 import mayur.dev.smartexpensetackerapi.expense.repository.ExpenseRepository;
+import mayur.dev.smartexpensetackerapi.user.entity.User;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +25,10 @@ public class ExpenseService {
 
 
     public ExpenseResponse createExpense(ExpenseRequest request) {
+        User user = (User) Objects.requireNonNull(SecurityContextHolder
+                        .getContext()
+                        .getAuthentication())
+                .getPrincipal();
 
         Expense expense = new Expense();
         expense.setCategory(request.getCategory().toLowerCase());
@@ -28,7 +36,7 @@ public class ExpenseService {
         expense.setAmount(request.getAmount());
         // Set this manually here so the database always has the correct time
         expense.setCreatedAt(LocalDateTime.now());
-        ;
+        expense.setUser(user);
 
         Expense saved = expenseRepository.save(expense);
 
@@ -36,15 +44,19 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponse> getAllExpenses() {
-        return expenseRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        User user = SecurityUtils.getCurrentUser();
+        return expenseRepository.findByUserId(user.getId()).stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public Double getTotalExpense() {
-        return expenseRepository.getTotalExpense();
+        User user = SecurityUtils.getCurrentUser();
+        return expenseRepository.getTotalExpenseByUserId(user.getId());
     }
 
     public Map<String, BigDecimal> getCategoryAnalytics() {
-        List<Object[]> data = expenseRepository.getCategoryWiseExpense();
+        User user = SecurityUtils.getCurrentUser();
+        List<Object[]> data =
+                expenseRepository.getCategoryWiseExpenseByUserId(user.getId());
 
         Map<String, BigDecimal> result = new HashMap<>();
 
@@ -55,8 +67,8 @@ public class ExpenseService {
         return result;
     }
 
-    public List<ExpenseResponse> getExpensesByCategory(String category) {
-        return expenseRepository.getExpensesByCategory(category).stream().map(this::mapToResponse).collect(Collectors.toList());
+    public List<ExpenseResponse> getExpensesByCategory(Long userId, String category) {
+        return expenseRepository.findByUserIdAndCategory(userId,category).stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
 //    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {

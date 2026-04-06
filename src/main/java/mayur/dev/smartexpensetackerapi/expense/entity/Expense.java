@@ -2,6 +2,8 @@ package mayur.dev.smartexpensetackerapi.expense.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mayur.dev.smartexpensetackerapi.user.entity.User;
+
 import java.math.BigDecimal;
 import java.time.*;
 
@@ -21,6 +23,9 @@ public class Expense {
     private BigDecimal amount;
     private String category;
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    private User user; //IMPORTANT
 }
 
 // =============================

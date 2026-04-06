@@ -23,11 +23,15 @@ Pagination and Sorting capabilities.
  */
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    List<Expense> getExpensesByCategory(String category);
+    List<Expense> findByUserIdAndCategory(Long userId,String category);
 
-    @Query("SELECT SUM(e.amount) FROM Expense e")
-    Double getTotalExpense();
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId")
+    Double getTotalExpenseByUserId(Long userId);
 
-    @Query("SELECT e.category, SUM(e.amount) FROM Expense e GROUP BY e.category")
-    List<Object[]> getCategoryWiseExpense();
+    @Query("SELECT e.category, SUM(e.amount) FROM Expense e WHERE e.user.id =" +
+            " :userId GROUP BY e.category")
+    List<Object[]> getCategoryWiseExpenseByUserId(Long userId);
+
+    List<Expense> findByUserId(Long userId);
+
 }

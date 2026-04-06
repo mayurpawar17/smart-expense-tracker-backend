@@ -2,10 +2,12 @@ package mayur.dev.smartexpensetackerapi.expense.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
 import mayur.dev.smartexpensetackerapi.expense.service.ExpenseService;
+import mayur.dev.smartexpensetackerapi.user.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,10 +35,11 @@ public class ExpenseController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getAllExpenses(@RequestParam(required = false) String category) {
         List<ExpenseResponse> data;
-
+        User user = SecurityUtils.getCurrentUser();
         if (category != null && !category.isBlank()) {
             String categoryInLowerCase=category.toLowerCase();
-            data = expenseService.getExpensesByCategory(categoryInLowerCase);
+            data =
+                    expenseService.getExpensesByCategory(user.getId(), categoryInLowerCase);
         } else {
             data = expenseService.getAllExpenses();
         }
@@ -55,6 +58,20 @@ public class ExpenseController {
         var categoryAnalytic = expenseService.getCategoryAnalytics();
         return ResponseEntity.ok(ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic));
     }
+
+//    @GetMapping
+//    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getMyExpenses(@RequestParam(required = false) String category) {
+//        List<ExpenseResponse> data;
+//
+//        if (category != null && !category.isBlank()) {
+//            String categoryInLowerCase=category.toLowerCase();
+//            data = expenseService.getExpensesByCategory(categoryInLowerCase);
+//        } else {
+//            data = expenseService.getMyExpenses();
+//        }
+//
+//        return ResponseEntity.ok(ApiResponse.success(data, "Expenses fetched successfully!"));
+//    }
 
 
 }
