@@ -6,6 +6,9 @@ import mayur.dev.smartexpensetackerapi.auth.dto.AuthResponse;
 import mayur.dev.smartexpensetackerapi.auth.dto.LoginRequest;
 import mayur.dev.smartexpensetackerapi.auth.dto.RegisterRequest;
 import mayur.dev.smartexpensetackerapi.auth.jwt.JwtUtil;
+import mayur.dev.smartexpensetackerapi.refreshToken.entity.RefreshToken;
+import mayur.dev.smartexpensetackerapi.refreshToken.repository.RefreshTokenRepository;
+import mayur.dev.smartexpensetackerapi.refreshToken.service.RefreshTokenService;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
 import mayur.dev.smartexpensetackerapi.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,24 +24,8 @@ public class AuthService {
 
     private final JwtUtil jwtUtil;
 
+    private  final RefreshTokenService refreshTokenService;
 
-    // Register
-//    public String register(RegisterRequest request) {
-//        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-//            return "Email already exists";
-//        }
-//
-//        User user = new User();
-//        user.setName(request.getName());
-//        user.setEmail(request.getEmail());
-//
-//        // Hash password
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
-//
-//        userRepository.save(user);
-//
-//        return "User registered successfully";
-//    }
 
     public AuthResponse register(RegisterRequest request) {
 
@@ -53,10 +40,17 @@ public class AuthService {
 
         userRepository.save(user);
 
-        //Generate token directly (better UX)
-        String token = jwtUtil.generateToken(user.getEmail());
+        // Generate access token
+        String accessToken = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token, user.getEmail());
+        //Generate refresh token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        return new AuthResponse(
+                accessToken,
+                refreshToken.getToken(),
+                user.getEmail()
+        );
     }
 
     // Login
@@ -68,9 +62,12 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        String token = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token, user.getEmail());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+//        return new AuthResponse(token, user.getEmail());
+        return new AuthResponse(accessToken, refreshToken.getToken(), user.getEmail());
     }
 
 
