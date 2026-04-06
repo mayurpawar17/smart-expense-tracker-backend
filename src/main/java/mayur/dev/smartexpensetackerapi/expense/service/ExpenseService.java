@@ -1,10 +1,10 @@
-package mayur.dev.smartexpensetackerapi.service;
+package mayur.dev.smartexpensetackerapi.expense.service;
 
 import lombok.RequiredArgsConstructor;
-import mayur.dev.smartexpensetackerapi.dto.ExpenseRequest;
-import mayur.dev.smartexpensetackerapi.dto.ExpenseResponse;
-import mayur.dev.smartexpensetackerapi.entity.Expense;
-import mayur.dev.smartexpensetackerapi.repository.ExpenseRepository;
+import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
+import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
+import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
+import mayur.dev.smartexpensetackerapi.expense.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

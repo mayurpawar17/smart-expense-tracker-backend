@@ -1,4 +1,4 @@
-package mayur.dev.smartexpensetackerapi.dto;
+package mayur.dev.smartexpensetackerapi.core.utils.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;

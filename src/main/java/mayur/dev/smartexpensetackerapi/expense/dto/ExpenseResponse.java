@@ -1,4 +1,4 @@
-package mayur.dev.smartexpensetackerapi.dto;
+package mayur.dev.smartexpensetackerapi.expense.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

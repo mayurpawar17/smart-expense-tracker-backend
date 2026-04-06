@@ -1,6 +1,6 @@
-package mayur.dev.smartexpensetackerapi.controller;
+package mayur.dev.smartexpensetackerapi.expense.controller;
 
-import mayur.dev.smartexpensetackerapi.dto.ApiResponse;
+import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/api")
 public class TestController {
-    @GetMapping
+    @GetMapping("/test")
     public ApiResponse<Map<String, Object>> test() {
 
         Map<String, Object> testData = Map.of(
@@ -25,5 +25,10 @@ public class TestController {
                 .data(testData)
                 .timestamp(LocalDateTime.now())
                 .build();
+    }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "You are authenticated!";
     }
 }

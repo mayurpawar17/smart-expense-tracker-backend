@@ -1,11 +1,11 @@
-package mayur.dev.smartexpensetackerapi.controller;
+package mayur.dev.smartexpensetackerapi.expense.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mayur.dev.smartexpensetackerapi.dto.ApiResponse;
-import mayur.dev.smartexpensetackerapi.dto.ExpenseRequest;
-import mayur.dev.smartexpensetackerapi.dto.ExpenseResponse;
-import mayur.dev.smartexpensetackerapi.service.ExpenseService;
+import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
+import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
+import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
+import mayur.dev.smartexpensetackerapi.expense.service.ExpenseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;

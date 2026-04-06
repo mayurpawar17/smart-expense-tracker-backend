@@ -1,7 +1,5 @@
-package mayur.dev.smartexpensetackerapi.entity;
+package mayur.dev.smartexpensetackerapi.expense.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;

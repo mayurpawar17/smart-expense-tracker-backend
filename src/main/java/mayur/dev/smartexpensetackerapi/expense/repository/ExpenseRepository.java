@@ -1,6 +1,6 @@
-package mayur.dev.smartexpensetackerapi.repository;
+package mayur.dev.smartexpensetackerapi.expense.repository;
 
-import mayur.dev.smartexpensetackerapi.entity.Expense;
+import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

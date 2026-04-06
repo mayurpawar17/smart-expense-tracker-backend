@@ -1,9 +1,8 @@
-package mayur.dev.smartexpensetackerapi.dto;
+package mayur.dev.smartexpensetackerapi.expense.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
