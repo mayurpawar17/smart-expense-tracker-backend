@@ -1,9 +1,12 @@
 package mayur.dev.smartexpensetackerapi.auth.controller;
 
 import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.auth.dto.AuthResponse;
 import mayur.dev.smartexpensetackerapi.auth.dto.LoginRequest;
 import mayur.dev.smartexpensetackerapi.auth.dto.RegisterRequest;
 import mayur.dev.smartexpensetackerapi.auth.service.AuthService;
+import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +21,15 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
-        return authService.register(request);
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "User registered successfully"));
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
-        return authService.login(request);
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "User Login successfully"));
+
     }
 }

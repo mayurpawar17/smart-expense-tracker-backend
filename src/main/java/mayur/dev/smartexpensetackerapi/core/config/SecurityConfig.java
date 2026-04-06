@@ -27,7 +27,7 @@ public class SecurityConfig {
                 )
 
 
-                // 🔥 THIS FIXES 401 vs 403 ISSUE
+                //THIS FIXES 401 vs 403 ISSUE
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");

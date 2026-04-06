@@ -2,6 +2,7 @@ package mayur.dev.smartexpensetackerapi.auth.service;
 
 
 import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.auth.dto.AuthResponse;
 import mayur.dev.smartexpensetackerapi.auth.dto.LoginRequest;
 import mayur.dev.smartexpensetackerapi.auth.dto.RegisterRequest;
 import mayur.dev.smartexpensetackerapi.auth.jwt.JwtUtil;
@@ -22,26 +23,44 @@ public class AuthService {
 
 
     // Register
-    public String register(RegisterRequest request) {
+//    public String register(RegisterRequest request) {
+//        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+//            return "Email already exists";
+//        }
+//
+//        User user = new User();
+//        user.setName(request.getName());
+//        user.setEmail(request.getEmail());
+//
+//        // Hash password
+//        user.setPassword(passwordEncoder.encode(request.getPassword()));
+//
+//        userRepository.save(user);
+//
+//        return "User registered successfully";
+//    }
+
+    public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return "Email already exists";
+            throw new RuntimeException("Email already exists");
         }
 
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-
-        // Hash password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 
-        return "User registered successfully";
+        //Generate token directly (better UX)
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return new AuthResponse(token, user.getEmail());
     }
 
     // Login
-    public String login(LoginRequest request) {
+    public AuthResponse  login(LoginRequest request) {
 
         User user = (User) userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -49,8 +68,9 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        // Generate JWT
-        return jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return new AuthResponse(token, user.getEmail());
     }
 
 

@@ -23,7 +23,7 @@ public class ExpenseService {
     public ExpenseResponse createExpense(ExpenseRequest request) {
 
         Expense expense = new Expense();
-        expense.setCategory(request.getCategory());
+        expense.setCategory(request.getCategory().toLowerCase());
         expense.setTitle(request.getTitle());
         expense.setAmount(request.getAmount());
         // Set this manually here so the database always has the correct time

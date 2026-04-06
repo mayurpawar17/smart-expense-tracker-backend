@@ -6,6 +6,7 @@ import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
 import mayur.dev.smartexpensetackerapi.expense.service.ExpenseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -23,45 +24,37 @@ public class ExpenseController {
     // 2. Added @Valid to trigger validation rules
     // 3. Switched to Request/Response DTOs
     @PostMapping
-    public ApiResponse<ExpenseResponse> createExpense(@RequestBody @Valid ExpenseRequest expenseRequest) {
+    public ResponseEntity<ApiResponse<ExpenseResponse>> createExpense(@RequestBody @Valid ExpenseRequest expenseRequest) {
         ExpenseResponse data = expenseService.createExpense(expenseRequest);
-        return ApiResponse.success(data, "Expense created successfully!");
+        return ResponseEntity.ok(ApiResponse.success(data, "Expense created " + "successfully!"));
 
     }
 
     @GetMapping
-    public ApiResponse<List<ExpenseResponse>> getAllExpenses(@RequestParam(required = false) String category) {
-        List<ExpenseResponse> data ;
-//        return ApiResponse.success(data, "Retrieved " + data.size() + " expenses");
+    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getAllExpenses(@RequestParam(required = false) String category) {
+        List<ExpenseResponse> data;
 
         if (category != null && !category.isBlank()) {
-            data = expenseService.getExpensesByCategory(category);
+            String categoryInLowerCase=category.toLowerCase();
+            data = expenseService.getExpensesByCategory(categoryInLowerCase);
         } else {
             data = expenseService.getAllExpenses();
         }
 
-        return ApiResponse.success(data, "Expenses fetched successfully!");
+        return ResponseEntity.ok(ApiResponse.success(data, "Expenses fetched successfully!"));
     }
 
     @GetMapping("/total")
-    public ApiResponse<Double> getTotalExpense() {
+    public ResponseEntity<ApiResponse<Double>> getTotalExpense() {
         var totalExpense = expenseService.getTotalExpense();
-        return ApiResponse.success(totalExpense, "Retrieved " + totalExpense + " total expense");
+        return ResponseEntity.ok(ApiResponse.success(totalExpense, "Retrieved " + totalExpense + " total expense"));
     }
 
     @GetMapping("/analytics/category")
-    public ApiResponse<Map<String, BigDecimal>> categoryAnalytics() {
+    public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> categoryAnalytics() {
         var categoryAnalytic = expenseService.getCategoryAnalytics();
-        return ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic);
+        return ResponseEntity.ok(ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic));
     }
-
-//    @GetMapping
-//    public ApiResponse<List<ExpenseResponse>> getExpensesByCategory() {
-//        List<ExpenseResponse> data = expenseService.getExpensesByCategory();
-//        return ApiResponse.success(data, "Retrieved " + data.size() + " expenses");
-//    }
-
-
 
 
 }

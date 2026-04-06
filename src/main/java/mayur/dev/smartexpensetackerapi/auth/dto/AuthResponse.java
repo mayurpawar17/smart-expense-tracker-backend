@@ -1,11 +1,18 @@
 package mayur.dev.smartexpensetackerapi.auth.dto;
 
+import lombok.Data;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
 
-public record AuthResponse(
-        String accessToken,
-        String refreshToken,
-        Long expiresIn,
-        String tokenType,
-        User user
-) {}
+@Data
+public class AuthResponse {
+
+    private String token;
+    private String email;
+
+    public AuthResponse(String token, String email) {
+        this.token = token;
+        this.email = email;
+    }
+
+    // getters
+}
