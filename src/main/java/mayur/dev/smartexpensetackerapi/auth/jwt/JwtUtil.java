@@ -24,8 +24,8 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Extract email
-    public String extractEmail(String token) {
+    // Extract userId
+    public String extractSubject(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

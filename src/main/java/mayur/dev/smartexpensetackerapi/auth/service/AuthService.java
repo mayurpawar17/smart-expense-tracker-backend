@@ -41,7 +41,7 @@ public class AuthService {
         userRepository.save(user);
 
         // Generate access token
-        String accessToken = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateToken(user.getId().toString());
 
         //Generate refresh token
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
@@ -62,7 +62,7 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        String accessToken = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateToken(user.getId().toString());
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
