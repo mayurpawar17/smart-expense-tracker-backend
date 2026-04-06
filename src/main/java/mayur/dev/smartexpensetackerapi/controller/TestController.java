@@ -1,7 +1,6 @@
 package mayur.dev.smartexpensetackerapi.controller;
 
 import mayur.dev.smartexpensetackerapi.dto.ApiResponse;
-import mayur.dev.smartexpensetackerapi.dto.ExpenseResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

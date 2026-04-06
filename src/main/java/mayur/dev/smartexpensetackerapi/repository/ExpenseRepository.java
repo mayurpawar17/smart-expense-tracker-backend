@@ -23,7 +23,7 @@ Pagination and Sorting capabilities.
  */
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    List<Expense> findByCategory(String category);
+    List<Expense> getExpensesByCategory(String category);
 
     @Query("SELECT SUM(e.amount) FROM Expense e")
     Double getTotalExpense();

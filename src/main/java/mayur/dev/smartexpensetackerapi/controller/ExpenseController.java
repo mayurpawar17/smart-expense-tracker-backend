@@ -30,9 +30,17 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ApiResponse<List<ExpenseResponse>> getAllExpenses() {
-        List<ExpenseResponse> data = expenseService.getAllExpenses();
-        return ApiResponse.success(data, "Retrieved " + data.size() + " expenses");
+    public ApiResponse<List<ExpenseResponse>> getAllExpenses(@RequestParam(required = false) String category) {
+        List<ExpenseResponse> data ;
+//        return ApiResponse.success(data, "Retrieved " + data.size() + " expenses");
+
+        if (category != null && !category.isBlank()) {
+            data = expenseService.getExpensesByCategory(category);
+        } else {
+            data = expenseService.getAllExpenses();
+        }
+
+        return ApiResponse.success(data, "Expenses fetched successfully!");
     }
 
     @GetMapping("/total")
@@ -46,6 +54,14 @@ public class ExpenseController {
         var categoryAnalytic = expenseService.getCategoryAnalytics();
         return ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic);
     }
+
+//    @GetMapping
+//    public ApiResponse<List<ExpenseResponse>> getExpensesByCategory() {
+//        List<ExpenseResponse> data = expenseService.getExpensesByCategory();
+//        return ApiResponse.success(data, "Retrieved " + data.size() + " expenses");
+//    }
+
+
 
 
 }

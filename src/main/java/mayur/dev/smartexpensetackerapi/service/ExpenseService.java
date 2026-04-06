@@ -55,6 +55,10 @@ public class ExpenseService {
         return result;
     }
 
+    public List<ExpenseResponse> getExpensesByCategory(String category) {
+        return expenseRepository.getExpensesByCategory(category).stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
 //    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
 //        Expense expense = expenseRepository.findById(id)
 //                .orElseThrow(() -> new RuntimeException("Expense not found"));
