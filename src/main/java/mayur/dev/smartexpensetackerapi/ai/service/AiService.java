@@ -2,6 +2,8 @@ package mayur.dev.smartexpensetackerapi.ai.service;
 
 import lombok.RequiredArgsConstructor;
 import mayur.dev.smartexpensetackerapi.ai.dto.ExpenseAiResponse;
+import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
+import mayur.dev.smartexpensetackerapi.category.dto.CategorySummary;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -95,6 +98,98 @@ public class AiService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse AI response");
         }
+    }
+
+    public InsightResponse generateInsights(List<CategorySummary> summaryList) {
+
+        String prompt = buildPrompt(summaryList);
+
+        String aiText = callGemini(prompt);
+
+        try {
+            String cleanJson = extractJson(aiText);
+            return objectMapper.readValue(cleanJson, InsightResponse.class);
+
+        } catch (Exception e) {
+            return fallbackInsights(summaryList);
+        }
+    }
+
+    private String callGemini(String prompt) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> textPart = Map.of("text", prompt);
+        Map<String, Object> parts = Map.of("parts", List.of(textPart));
+        Map<String, Object> body = Map.of("contents", List.of(parts));
+
+        HttpEntity<Map<String, Object>> request =
+                new HttpEntity<>(body, headers);
+
+        String url = apiUrl + "?key=" + apiKey;
+
+        ResponseEntity<Map> response =
+                restTemplate.postForEntity(url, request, Map.class);
+
+        try {
+            List<Map<String, Object>> candidates =
+                    (List<Map<String, Object>>) response.getBody().get("candidates");
+
+            Map<String, Object> content =
+                    (Map<String, Object>) candidates.get(0).get("content");
+
+            List<Map<String, Object>> partsList =
+                    (List<Map<String, Object>>) content.get("parts");
+
+            return partsList.get(0).get("text").toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Gemini API parsing failed");
+        }
+    }
+
+    private String buildPrompt(List<CategorySummary> summaryList) {
+
+        return """
+    You are a financial assistant.
+
+    Analyze the expense summary and return JSON:
+
+    {
+      "summary": "short summary",
+      "topCategory": "category name",
+      "warning": "if overspending else null",
+      "suggestion": "money saving tip"
+    }
+
+    Rules:
+    - Keep it short
+    - Only JSON
+    - No explanation
+    - No markdown
+
+    Data:
+    %s
+    """.formatted(summaryList.toString());
+    }
+
+
+
+    private InsightResponse fallbackInsights(List<CategorySummary> data) {
+
+        InsightResponse res = new InsightResponse();
+
+        CategorySummary top = data.stream()
+                .max(Comparator.comparing(CategorySummary::getTotalAmount))
+                .orElse(null);
+
+        res.setSummary("Basic spending summary generated");
+        res.setTopCategory(top != null ? top.getCategory() : "Unknown");
+        res.setWarning(null);
+        res.setSuggestion("Try reducing spending in top category");
+
+        return res;
     }
 
     private String extractJson(String text) {

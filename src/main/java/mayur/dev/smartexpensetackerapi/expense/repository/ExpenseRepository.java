@@ -1,5 +1,6 @@
 package mayur.dev.smartexpensetackerapi.expense.repository;
 
+import mayur.dev.smartexpensetackerapi.category.dto.CategorySummary;
 import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,5 +34,15 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Object[]> getCategoryWiseExpenseByUserId(Long userId);
 
     List<Expense> findByUserId(Long userId);
+
+    @Query("""
+SELECT new mayur.dev.smartexpensetackerapi.category.dto.CategorySummary(e.category, SUM(e.amount))
+FROM Expense e
+WHERE e.user.id = :userId
+AND MONTH(e.createdAt) = :month
+AND YEAR(e.createdAt) = :year
+GROUP BY e.category
+""")
+    List<CategorySummary> getMonthlySummary(Long userId, int month, int year);
 
 }

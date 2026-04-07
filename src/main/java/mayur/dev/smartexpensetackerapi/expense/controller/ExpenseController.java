@@ -2,6 +2,7 @@ package mayur.dev.smartexpensetackerapi.expense.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -59,19 +61,21 @@ public class ExpenseController {
         return ResponseEntity.ok(ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic));
     }
 
-//    @GetMapping
-//    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getMyExpenses(@RequestParam(required = false) String category) {
-//        List<ExpenseResponse> data;
-//
-//        if (category != null && !category.isBlank()) {
-//            String categoryInLowerCase=category.toLowerCase();
-//            data = expenseService.getExpensesByCategory(categoryInLowerCase);
-//        } else {
-//            data = expenseService.getMyExpenses();
-//        }
-//
-//        return ResponseEntity.ok(ApiResponse.success(data, "Expenses fetched successfully!"));
-//    }
+
+
+    @GetMapping("/insights")
+    public InsightResponse getInsights(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ) {
+
+        LocalDate now = LocalDate.now();
+
+        int finalMonth = (month != null) ? month : now.getMonthValue();
+        int finalYear = (year != null) ? year : now.getYear();
+        User user = SecurityUtils.getCurrentUser(); // from security context
+        return expenseService.getMonthlyInsights(user.getId(), month, year);
+    }
 
 
 }

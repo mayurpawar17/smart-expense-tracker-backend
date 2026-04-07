@@ -2,7 +2,9 @@ package mayur.dev.smartexpensetackerapi.expense.service;
 
 import lombok.RequiredArgsConstructor;
 import mayur.dev.smartexpensetackerapi.ai.dto.ExpenseAiResponse;
+import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.ai.service.AiService;
+import mayur.dev.smartexpensetackerapi.category.dto.CategorySummary;
 import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
@@ -94,6 +96,15 @@ public class ExpenseService {
 
     public List<ExpenseResponse> getExpensesByCategory(Long userId, String category) {
         return expenseRepository.findByUserIdAndCategory(userId, category).stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+
+    public InsightResponse getMonthlyInsights(Long userId, int month, int year) {
+
+        List<CategorySummary> summary =
+                expenseRepository.getMonthlySummary(userId, month, year);
+
+        return aiService.generateInsights(summary);
     }
 
 //    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {

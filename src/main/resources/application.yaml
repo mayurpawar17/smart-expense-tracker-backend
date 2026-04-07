@@ -12,7 +12,3 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-ai:
-  api:
-    key: AIzaSyDi1rHrihC0dkBG-EBzqjHFjFrwG_nfZYE
-    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
