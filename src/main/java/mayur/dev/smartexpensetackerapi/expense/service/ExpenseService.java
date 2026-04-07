@@ -1,6 +1,8 @@
 package mayur.dev.smartexpensetackerapi.expense.service;
 
 import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.ai.dto.ExpenseAiResponse;
+import mayur.dev.smartexpensetackerapi.ai.service.AiService;
 import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
@@ -16,24 +18,48 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
+    private final AiService aiService;
+
+    ExpenseAiResponse aiResponse = null;
 
 
     public ExpenseResponse createExpense(ExpenseRequest request) {
-        User user = (User) Objects.requireNonNull(SecurityContextHolder
-                        .getContext()
-                        .getAuthentication())
-                .getPrincipal();
+        User user = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+        //Call AI
+        ExpenseAiResponse aiResponse = null;
 
+        try {
+            aiResponse = aiService.extractExpense(request.getTitle());
+        } catch (Exception e) {
+            // log this (important for debugging)
+            System.out.println("AI failed: " + e.getMessage());
+        }
         Expense expense = new Expense();
-        expense.setCategory(request.getCategory().toLowerCase());
         expense.setTitle(request.getTitle());
-        expense.setAmount(request.getAmount());
+
+        // ✅ CATEGORY FALLBACK
+        String category = resolveCategory(request, aiResponse);
+        expense.setCategory(category.toLowerCase());
+
+        // ✅ AMOUNT FALLBACK
+        BigDecimal amount = resolveAmount(request, aiResponse);
+        expense.setAmount(amount);
+
+////        expense.setCategory(request.getCategory().toLowerCase());
+//        expense.setCategory(aiResponse.getCategory().toLowerCase());
+//
+////        expense.setAmount(request.getAmount());
+//        expense.setAmount(BigDecimal.valueOf(aiResponse.getAmount()));
+
+
         // Set this manually here so the database always has the correct time
         expense.setCreatedAt(LocalDateTime.now());
         expense.setUser(user);
@@ -55,8 +81,7 @@ public class ExpenseService {
 
     public Map<String, BigDecimal> getCategoryAnalytics() {
         User user = SecurityUtils.getCurrentUser();
-        List<Object[]> data =
-                expenseRepository.getCategoryWiseExpenseByUserId(user.getId());
+        List<Object[]> data = expenseRepository.getCategoryWiseExpenseByUserId(user.getId());
 
         Map<String, BigDecimal> result = new HashMap<>();
 
@@ -68,7 +93,7 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponse> getExpensesByCategory(Long userId, String category) {
-        return expenseRepository.findByUserIdAndCategory(userId,category).stream().map(this::mapToResponse).collect(Collectors.toList());
+        return expenseRepository.findByUserIdAndCategory(userId, category).stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
 //    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
@@ -94,5 +119,53 @@ public class ExpenseService {
         res.setCategory(e.getCategory());
         res.setCreatedAt(e.getCreatedAt());
         return res;
+    }
+
+    private String resolveCategory(ExpenseRequest request, ExpenseAiResponse ai) {
+
+        // 1️⃣ Priority: AI
+        if (ai != null && ai.getCategory() != null && !ai.getCategory().isBlank()) {
+            return ai.getCategory();
+        }
+
+        // 2️⃣ Fallback: Request (if user sends manually)
+        if (request.getCategory() != null && !request.getCategory().isBlank()) {
+            return request.getCategory();
+        }
+
+        // 3️⃣ Final fallback
+        return "Other";
+    }
+
+    private BigDecimal resolveAmount(ExpenseRequest request, ExpenseAiResponse ai) {
+
+        // 1️⃣ AI value
+        if (ai != null && ai.getAmount() != null && ai.getAmount() > 0) {
+            return BigDecimal.valueOf(ai.getAmount());
+        }
+
+        // 2️⃣ Request value
+        if (request.getAmount() != null && request.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+            return request.getAmount();
+        }
+
+        // 3️⃣ Extract from text (last fallback)
+        Double extracted = extractAmountFromText(request.getTitle());
+        if (extracted != null) {
+            return BigDecimal.valueOf(extracted);
+        }
+
+        // 4️⃣ अंतिम fallback (fail-safe)
+        throw new RuntimeException("Amount is required");
+    }
+
+    private Double extractAmountFromText(String text) {
+        Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?)");
+        Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            return Double.parseDouble(matcher.group(1));
+        }
+        return null;
     }
 }
