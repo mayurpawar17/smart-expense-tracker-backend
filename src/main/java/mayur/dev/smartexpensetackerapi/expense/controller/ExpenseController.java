@@ -3,6 +3,7 @@ package mayur.dev.smartexpensetackerapi.expense.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
+import mayur.dev.smartexpensetackerapi.category.entity.CategoryData;
 import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
@@ -14,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/expenses")
+@RequestMapping("/v1/expenses")
 @RequiredArgsConstructor
 public class ExpenseController {
 
@@ -39,9 +41,8 @@ public class ExpenseController {
         List<ExpenseResponse> data;
         User user = SecurityUtils.getCurrentUser();
         if (category != null && !category.isBlank()) {
-            String categoryInLowerCase=category.toLowerCase();
-            data =
-                    expenseService.getExpensesByCategory(user.getId(), categoryInLowerCase);
+            String categoryInLowerCase = category.toLowerCase();
+            data = expenseService.getExpensesByCategory(user.getId(), categoryInLowerCase);
         } else {
             data = expenseService.getAllExpenses();
         }
@@ -56,18 +57,27 @@ public class ExpenseController {
     }
 
     @GetMapping("/analytics/category")
-    public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> categoryAnalytics() {
+    public ResponseEntity<ApiResponse<List<CategoryData>>> categoryAnalytics() {
         var categoryAnalytic = expenseService.getCategoryAnalytics();
-        return ResponseEntity.ok(ApiResponse.success(categoryAnalytic, "Retrieved " + categoryAnalytic));
+        return ResponseEntity.ok(ApiResponse.success(categoryAnalytic, "Retrieved Category expense successfully"));
+    }
+
+    @GetMapping("/current-month-total")
+    public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> getCurrentMonthTotal() {
+        // 1. Get the single value from the service
+        BigDecimal total = expenseService.getCurrentMonthTotal();
+
+        // 2. Create a Map and put the total inside it
+        Map<String, BigDecimal> responseMap = new HashMap<>();
+        responseMap.put("totalExpense", total);
+
+        // 3. Return the Map inside your ApiResponse
+        return ResponseEntity.ok(ApiResponse.success(responseMap, "Retrieved total expense successfully"));
     }
 
 
-
     @GetMapping("/insights")
-    public InsightResponse getInsights(
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year
-    ) {
+    public InsightResponse getInsights(@RequestParam(required = false) Integer month, @RequestParam(required = false) Integer year) {
 
         LocalDate now = LocalDate.now();
 

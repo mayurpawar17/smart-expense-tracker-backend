@@ -12,15 +12,13 @@ import mayur.dev.smartexpensetackerapi.refreshToken.dto.RefreshRequest;
 import mayur.dev.smartexpensetackerapi.refreshToken.entity.RefreshToken;
 import mayur.dev.smartexpensetackerapi.refreshToken.service.RefreshTokenService;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -39,6 +37,17 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success(response, "User Login successfully"));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getCurrentUser() {
+        User user = SecurityUtils.getCurrentUser();
+
+        Map<String, Object> userData = Map.of(
+                "id", user.getId(),
+                "email", user.getEmail()
+        );
+        return ResponseEntity.ok(ApiResponse.success(userData, "User Login successfully"));
     }
 
     @PostMapping("/refresh")

@@ -4,7 +4,9 @@ import mayur.dev.smartexpensetackerapi.category.dto.CategorySummary;
 import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 /*
 This code is a Spring Data JPA Repository, which acts as the data access layer for your application. Using an interface like this allows you to interact with your database using Java methods instead of writing manual SQL connection logic.
@@ -44,5 +46,11 @@ AND YEAR(e.createdAt) = :year
 GROUP BY e.category
 """)
     List<CategorySummary> getMonthlySummary(Long userId, int month, int year);
+
+    @Query("SELECT SUM(e.amount) FROM Expense e " +
+            "WHERE e.user.id = :userId " +
+            "AND YEAR(e.createdAt) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(e.createdAt) = MONTH(CURRENT_DATE)")
+    BigDecimal sumTotalExpenseForCurrentMonth(@Param("userId") Long userId);
 
 }

@@ -5,6 +5,7 @@ import mayur.dev.smartexpensetackerapi.ai.dto.ExpenseAiResponse;
 import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.ai.service.AiService;
 import mayur.dev.smartexpensetackerapi.category.dto.CategorySummary;
+import mayur.dev.smartexpensetackerapi.category.entity.CategoryData;
 import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
@@ -81,17 +82,22 @@ public class ExpenseService {
         return expenseRepository.getTotalExpenseByUserId(user.getId());
     }
 
-    public Map<String, BigDecimal> getCategoryAnalytics() {
+    public List<CategoryData> getCategoryAnalytics() {
         User user = SecurityUtils.getCurrentUser();
         List<Object[]> data = expenseRepository.getCategoryWiseExpenseByUserId(user.getId());
 
-        Map<String, BigDecimal> result = new HashMap<>();
+        return data.stream()
+                .map(row -> new CategoryData(
+                        (String) row[0],
+                        (BigDecimal) row[1]
+                ))
+                .toList();
+    }
 
-        for (Object[] row : data) {
-            result.put((String) row[0], (BigDecimal) row[1]);
-        }
-
-        return result;
+    public BigDecimal getCurrentMonthTotal() {
+        User user = SecurityUtils.getCurrentUser();
+        BigDecimal total = expenseRepository.sumTotalExpenseForCurrentMonth(user.getId());
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     public List<ExpenseResponse> getExpensesByCategory(Long userId, String category) {
@@ -100,10 +106,8 @@ public class ExpenseService {
 
 
     public InsightResponse getMonthlyInsights(Long userId, int month, int year) {
-
         List<CategorySummary> summary =
                 expenseRepository.getMonthlySummary(userId, month, year);
-
         return aiService.generateInsights(summary);
     }
 
