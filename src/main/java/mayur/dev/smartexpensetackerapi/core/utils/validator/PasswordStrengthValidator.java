@@ -1,9 +1,5 @@
 package mayur.dev.smartexpensetackerapi.core.utils.validator;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-import me.gosimple.nbvcxz.Nbvcxz;
-import me.gosimple.nbvcxz.scoring.Result;
 
 
 // Example of a custom validator using nbvcxz

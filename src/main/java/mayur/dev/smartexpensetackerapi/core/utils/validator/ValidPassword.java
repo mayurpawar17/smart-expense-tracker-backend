@@ -1,8 +1,5 @@
 package mayur.dev.smartexpensetackerapi.core.utils.validator;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
-import java.lang.annotation.*;
 
 //@Documented
 //@Constraint(validatedBy = PasswordStrengthValidator.class) // Links to your logic

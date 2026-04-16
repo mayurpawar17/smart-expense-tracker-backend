@@ -1,7 +1,6 @@
 package mayur.dev.smartexpensetackerapi.auth.dto;
 
 import lombok.Data;
-import mayur.dev.smartexpensetackerapi.user.entity.User;
 
 @Data
 public class AuthResponse {
