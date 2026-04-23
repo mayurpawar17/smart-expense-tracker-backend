@@ -2,7 +2,7 @@ package mayur.dev.smartexpensetackerapi.core.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import mayur.dev.smartexpensetackerapi.auth.jwt.JwtAuthFilter;
+import mayur.dev.smartexpensetackerapi.features.auth.jwt.JwtAuthFilter;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

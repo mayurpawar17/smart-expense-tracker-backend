@@ -1,25 +1,33 @@
 package mayur.dev.smartexpensetackerapi.core.utils.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-@JsonPropertyOrder({"success", "message", "data", "timestamp"})
+@JsonPropertyOrder({"status", "message", "data"})
+@JsonInclude(JsonInclude.Include.NON_NULL) // Hides null fields (like pagination on single-object responses)
 public class ApiResponse<T> {
-    private boolean success;
+    private String status;
     private String message;
     private T data;
-    private LocalDateTime timestamp;
+    private Pagination pagination;
 
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return ApiResponse.<T>builder().success(true).message(message).data(data).timestamp(LocalDateTime.now()).build();
+
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>("success", message, data, null);
+    }
+
+    public static <T> ApiResponse<T> success(String message, T data, Pagination pagination) {
+        return new ApiResponse<>("success", message, data, pagination);
     }
 
     public static <T> ApiResponse<T> error(String message) {
-        return ApiResponse.<T>builder().success(false).message(message).data(null).timestamp(LocalDateTime.now()).build();
+        return new ApiResponse<>("error", message, null, null);
     }
 }
+
