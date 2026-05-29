@@ -1,5 +1,9 @@
 HELP.md
+# Target/Build Directories (Compiled Java files)
 target/
+*.jar
+*.war
+*.ear
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -37,3 +41,15 @@ build/
 application.yaml
 application.yml
 application.properties
+
+# OS Specific files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Local Environment/Secret configurations
+# (Just in case you create local environment override files)
+.env
+.env.local

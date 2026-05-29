@@ -30,6 +30,9 @@ public class AiService {
     @Value("${ai.api.url}")
     private String apiUrl;
 
+    @Value("${ai.api.model}")
+    private String model;
+
     public ExpenseAiResponse extractExpense(String input) {
 
         String prompt = """
@@ -49,57 +52,69 @@ public class AiService {
                 Expense: %s
                 """.formatted(input);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> textPart = Map.of("text", prompt);
-        Map<String, Object> parts = Map.of("parts", List.of(textPart));
-        Map<String, Object> body = Map.of("contents", List.of(parts));
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-
-        String url = apiUrl + "?key=" + apiKey;
-
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+        String aiText = callGroq(prompt);
 
         try {
-            // Extract AI text
-            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
-
-            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
-
-            List<Map<String, Object>> partsList = (List<Map<String, Object>>) content.get("parts");
-
-            String aiText = partsList.get(0).get("text").toString();
-
-            // Convert JSON string → DTO
-//            return objectMapper.readValue(aiText, ExpenseAiResponse.class);
-
-            try {
-                String cleanJson = extractJson(aiText);
-                return objectMapper.readValue(cleanJson, ExpenseAiResponse.class);
-
-            } catch (Exception e) {
-                // fallback logic
-                ExpenseAiResponse fallback = new ExpenseAiResponse();
-                fallback.setCategory("Other");
-
-                // try extract amount manually
-                fallback.setAmount(extractAmount(input));
-
-                return fallback;
-            }
-
+            String cleanJson = extractJson(aiText);
+            return objectMapper.readValue(cleanJson, ExpenseAiResponse.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse AI response");
+            ExpenseAiResponse fallback = new ExpenseAiResponse();
+            fallback.setCategory("Other");
+            fallback.setAmount(extractAmount(input));
+            return fallback;
         }
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        Map<String, Object> textPart = Map.of("text", prompt);
+//        Map<String, Object> parts = Map.of("parts", List.of(textPart));
+//        Map<String, Object> body = Map.of("contents", List.of(parts));
+//
+//        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+//
+//        String url = apiUrl + "?key=" + apiKey;
+//
+//        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+//
+//        try {
+//            // Extract AI text
+//            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
+//
+//            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
+//
+//            List<Map<String, Object>> partsList = (List<Map<String, Object>>) content.get("parts");
+//
+//            String aiText = partsList.get(0).get("text").toString();
+//
+//            // Convert JSON string → DTO
+////            return objectMapper.readValue(aiText, ExpenseAiResponse.class);
+//
+//            try {
+//                String cleanJson = extractJson(aiText);
+//                return objectMapper.readValue(cleanJson, ExpenseAiResponse.class);
+//
+//            } catch (Exception e) {
+//                // fallback logic
+//                ExpenseAiResponse fallback = new ExpenseAiResponse();
+//                fallback.setCategory("Other");
+//
+//                // try extract amount manually
+//                fallback.setAmount(extractAmount(input));
+//
+//                return fallback;
+//            }
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to parse AI response");
+//        }
     }
 
     public InsightResponse generateInsights(List<CategorySummary> summaryList) {
 
         String prompt = buildPrompt(summaryList);
 
-        String aiText = callGemini(prompt);
+        String aiText = callGroq(prompt);
 
         try {
             String cleanJson = extractJson(aiText);
@@ -110,15 +125,18 @@ public class AiService {
         }
     }
 
-    private String callGemini(String prompt) {
+    private String callGroq(String prompt) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey); // Authorization: Bearer <key>
 
-        Map<String, Object> textPart = Map.of("text", prompt);
-        Map<String, Object> parts = Map.of("parts", List.of(textPart));
-        Map<String, Object> body = Map.of("contents", List.of(parts));
-
+        Map<String, Object> message = Map.of(
+                "role", "user",
+                "content", prompt);
+//        Map<String, Object> parts = Map.of("parts", List.of(textPart));
+        Map<String, Object> body = Map.of("model", model,"messages", List.of(message),"temperature", 0.2);
+        System.out.println("Groq request body: " + new ObjectMapper().writeValueAsString(body));
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         String url = apiUrl + "?key=" + apiKey;
@@ -126,16 +144,21 @@ public class AiService {
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
         try {
-            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
 
-            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
-
-            List<Map<String, Object>> partsList = (List<Map<String, Object>>) content.get("parts");
-
-            return partsList.get(0).get("text").toString();
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
+            Map<String, Object> messageResp = (Map<String, Object>) choices.get(0).get("message");
+            return messageResp.get("content").toString();
+//
+//            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
+//
+//            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
+//
+//            List<Map<String, Object>> partsList = (List<Map<String, Object>>) content.get("parts");
+//
+//            return partsList.get(0).get("text").toString();
 
         } catch (Exception e) {
-            throw new RuntimeException("Gemini API parsing failed");
+            throw new RuntimeException("Groq API parsing failed");
         }
     }
 

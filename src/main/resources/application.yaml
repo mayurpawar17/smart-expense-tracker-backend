@@ -3,10 +3,11 @@ spring:
     name: smart-expense-tacker-api
 
   datasource:
-    url: jdbc:postgresql://ep-sparkling-lab-amc1xv05-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
-    username: neondb_owner
-    password: npg_1NWVOjvAkce6
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     #    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -19,14 +20,22 @@ spring:
     # Turns off the Spring ASCII Art
     banner-mode: "off"
     # Optional: Silences startup info logs but keeps errors
-    log-startup-info: false
+#    log-startup-info: false
 
-logging:
-  level:
-    # Root level WARN silences the generic Spring/Hibernate/Tomcat logs
-    root: WARN
-    # Keep your specific package at INFO so you can see your own logs
-    mayur.dev.smartexpensetackerapi: INFO
-    # Silences the specific "Bean successfully defined" spam
-    org.springframework.web: WARN
+#logging:
+#  level:
+#    # Root level WARN silences the generic Spring/Hibernate/Tomcat logs
+#    root: WARN
+#    # Keep your specific package at INFO so you can see your own logs
+#    mayur.dev.smartexpensetackerapi: INFO
+#    # Silences the specific "Bean successfully defined" spam
+#    org.springframework.web: WARN
+
+ai:
+  api:
+    key: ${GROQ_API_KEY}
+    url: ${GROQ_API_URL:https://api.groq.com/openai/v1/chat/completions}
+    model: ${GROQ_API_MODEL}
+
+
 
