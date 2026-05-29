@@ -1,6 +1,14 @@
+
+
+# Stage 1: Build the application using official Eclipse Temurin JDK 25
+FROM eclipse-temurin:25-jdk-noble AS build
 # Stage 1: Build the application using JDK 25
-FROM maven:eclipse-temurin-25 AS build
+#FROM maven:eclipse-temurin-25 AS build
 WORKDIR /app
+
+# Install Maven manually to ensure compatibility with JDK 25
+RUN apt-get update && apt-get install -y maven
+
 COPY . .
 RUN mvn clean package -DskipTests
 
