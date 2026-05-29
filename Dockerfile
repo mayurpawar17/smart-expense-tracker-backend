@@ -1,5 +1,5 @@
 # Stage 1: Build the application using JDK 25
-FROM maven:3.9.6-eclipse-temurin-25 AS build
+FROM maven:eclipse-temurin-25 AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
