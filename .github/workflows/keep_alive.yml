@@ -1,10 +1,11 @@
 #  This is just a friendly label. When you look at the "Actions" tab on GitHub,
 #  this is the title you will see next to the running task so you know what it's doing.
 name: Keep Render Awake
-
 on:
   schedule:
     - cron: '*/12 * * * *'
+  workflow_dispatch:
+
 
 jobs:
   ping-server:
