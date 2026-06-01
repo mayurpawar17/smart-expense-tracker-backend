@@ -1,0 +1,14 @@
+#  This is just a friendly label. When you look at the "Actions" tab on GitHub,
+#  this is the title you will see next to the running task so you know what it's doing.
+name: Keep Render Awake
+
+on:
+  schedule:
+    - cron: '*/12 * * * *'
+
+jobs:
+  ping-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Ping Request
+        run: curl -s https://smart-expense-tracker-backend-vlm6.onrender.com/
