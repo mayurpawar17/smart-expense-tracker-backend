@@ -53,7 +53,7 @@ public class AuthController {
 
         RefreshToken refreshToken = refreshTokenService.verifyToken(request.getRefreshToken());
 
-        String newAccessToken = jwtUtil.generateToken(refreshToken.getUser().getEmail());
+        String newAccessToken = jwtUtil.generateToken(refreshToken.getUser().getEmail(),refreshToken.getUser().getId());
 
         AuthResponse data = new AuthResponse(newAccessToken, refreshToken.getToken(), refreshToken.getUser().getEmail());
 

@@ -22,7 +22,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
-    private final UserRepository userRepository;
+//    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -48,12 +48,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String email = jwtUtil.extractSubject(token);
+        Long userId =jwtUtil.extractUserId(token);
 
-        User user = userRepository.findByEmail(email).orElse(null);
+//        User user = userRepository.findByEmail(email).orElse(null);
 
-        if (user != null) {
+        if (email != null) {
+
+            User principalUser = new User();
+            principalUser.setId(userId);
+            principalUser.setEmail(email);
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(principalUser, null, Collections.emptyList());
 // ADD THIS LINE
             auth.setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);

@@ -1,6 +1,7 @@
 package mayur.dev.smartexpensetackerapi.features.ai.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.ExpenseAiResponse;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummary;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiService {
@@ -136,7 +138,7 @@ public class AiService {
                 "content", prompt);
 //        Map<String, Object> parts = Map.of("parts", List.of(textPart));
         Map<String, Object> body = Map.of("model", model,"messages", List.of(message),"temperature", 0.2);
-        System.out.println("Groq request body: " + new ObjectMapper().writeValueAsString(body));
+        log.info("Groq request body: " + new ObjectMapper().writeValueAsString(body));
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         String url = apiUrl + "?key=" + apiKey;

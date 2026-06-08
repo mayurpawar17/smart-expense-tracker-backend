@@ -6,7 +6,6 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 
 @Component
@@ -26,9 +25,10 @@ public class JwtUtil {
     }
 
     // Generate token
-    public String generateToken(String email) {
+    public String generateToken(String email, Long userId) {
         return Jwts.builder()
-                .subject(email)
+                .subject(email).
+                claim("userId", userId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hr
                 .signWith(getSigningKey())
@@ -43,6 +43,15 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public Long extractUserId(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userId", Long.class);
     }
 
     // Validate token

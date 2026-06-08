@@ -1,5 +1,6 @@
 package mayur.dev.smartexpensetackerapi.features.expense.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.ExpenseAiResponse;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponse;
@@ -28,15 +29,17 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final AiService aiService;
+    private final jakarta.persistence.EntityManager entityManager;
 
     ExpenseAiResponse aiResponse = null;
 
 
     public ExpenseResponse createExpense(ExpenseRequest request) {
-        User user = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+        User principal = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
         //Call AI
         ExpenseAiResponse aiResponse = null;
 
@@ -66,7 +69,10 @@ public class ExpenseService {
 
         // Set this manually here so the database always has the correct time
         expense.setCreatedAt(LocalDateTime.now());
-        expense.setUser(user);
+
+        // This stops Hibernate from running an extra SELECT query on the user table before saving.
+        User userProxy = entityManager.getReference(User.class, principal.getId());
+        expense.setUser(userProxy);
 
         Expense saved = expenseRepository.save(expense);
 

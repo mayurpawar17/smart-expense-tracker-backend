@@ -30,4 +30,12 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+
+    // 1. Catch your custom UnauthenticatedException
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthenticatedException(UnauthenticatedException ex) {
+        ApiResponse<Object> body = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
 }
