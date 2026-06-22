@@ -1,5 +1,6 @@
 package mayur.dev.smartexpensetackerapi.core.utils.security;
 
+import lombok.extern.slf4j.Slf4j;
 import mayur.dev.smartexpensetackerapi.core.exception.UnauthenticatedException;
 import mayur.dev.smartexpensetackerapi.features.user.entity.User;
 import org.springframework.security.core.Authentication;
@@ -7,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Objects;
 
+@Slf4j
 public class SecurityUtils {
 
     //    public static User getCurrentUser() {
@@ -19,6 +21,7 @@ public class SecurityUtils {
         if (auth != null && auth.getPrincipal() instanceof User) {
             return (User) auth.getPrincipal();
         }
+        log.warn("No user found in security context");
         throw new UnauthenticatedException("No user found in security context");
     }
 }
