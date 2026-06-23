@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import mayur.dev.smartexpensetackerapi.core.utils.security.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.Pagination;
-import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponse;
+import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponseDTO;
 import mayur.dev.smartexpensetackerapi.features.category.entity.CategoryData;
 import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseResponse;
@@ -89,7 +89,7 @@ public class ExpenseController {
 
 
     @GetMapping("/insights")
-    public InsightResponse getInsights(@RequestParam(required = false) Integer month, @RequestParam(required = false) Integer year) {
+    public InsightResponseDTO getInsights(@RequestParam(required = false) Integer month, @RequestParam(required = false) Integer year) {
 
         LocalDate now = LocalDate.now();
 

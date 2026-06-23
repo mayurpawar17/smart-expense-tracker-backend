@@ -1,6 +1,6 @@
 package mayur.dev.smartexpensetackerapi.features.expense.repository;
 
-import mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummary;
+import mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummaryRequestDTO;
 import mayur.dev.smartexpensetackerapi.features.expense.entity.Expense;
 
 import org.springframework.data.domain.Page;
@@ -57,7 +57,7 @@ AND MONTH(e.createdAt) = :month
 AND YEAR(e.createdAt) = :year
 GROUP BY e.category
 """)
-    List<CategorySummary> getMonthlySummary(Long userId, int month, int year);
+    List<CategorySummaryRequestDTO> getMonthlySummary(Long userId, int month, int year);
 
     @Query("SELECT SUM(e.amount) FROM Expense e " +
             "WHERE e.user.id = :userId " +

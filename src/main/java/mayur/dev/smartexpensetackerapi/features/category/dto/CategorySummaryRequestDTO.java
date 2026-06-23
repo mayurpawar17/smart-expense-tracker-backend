@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class CategorySummary {
+public class CategorySummaryRequestDTO {
     private String category;
     private BigDecimal totalAmount;
 }

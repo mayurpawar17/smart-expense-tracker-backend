@@ -2,9 +2,9 @@ package mayur.dev.smartexpensetackerapi.features.ai.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mayur.dev.smartexpensetackerapi.features.ai.dto.ExpenseAiResponse;
-import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponse;
-import mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummary;
+import mayur.dev.smartexpensetackerapi.features.ai.dto.ExpenseAiResponseDTO;
+import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponseDTO;
+import mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummaryRequestDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +35,7 @@ public class AiService {
     @Value("${ai.api.model}")
     private String model;
 
-    public ExpenseAiResponse extractExpense(String input) {
+    public ExpenseAiResponseDTO extractExpense(String input) {
 
         String prompt = """
                 Extract the following from the expense text:
@@ -58,9 +58,9 @@ public class AiService {
 
         try {
             String cleanJson = extractJson(aiText);
-            return objectMapper.readValue(cleanJson, ExpenseAiResponse.class);
+            return objectMapper.readValue(cleanJson, ExpenseAiResponseDTO.class);
         } catch (Exception e) {
-            ExpenseAiResponse fallback = new ExpenseAiResponse();
+            ExpenseAiResponseDTO fallback = new ExpenseAiResponseDTO();
             fallback.setCategory("Other");
             fallback.setAmount(extractAmount(input));
             return fallback;
@@ -112,7 +112,7 @@ public class AiService {
 //        }
     }
 
-    public InsightResponse generateInsights(List<CategorySummary> summaryList) {
+    public InsightResponseDTO generateInsights(List<CategorySummaryRequestDTO> summaryList) {
 
         String prompt = buildPrompt(summaryList);
 
@@ -120,7 +120,7 @@ public class AiService {
 
         try {
             String cleanJson = extractJson(aiText);
-            return objectMapper.readValue(cleanJson, InsightResponse.class);
+            return objectMapper.readValue(cleanJson, InsightResponseDTO.class);
 
         } catch (Exception e) {
             return fallbackInsights(summaryList);
@@ -164,7 +164,7 @@ public class AiService {
         }
     }
 
-    private String buildPrompt(List<CategorySummary> summaryList) {
+    private String buildPrompt(List<CategorySummaryRequestDTO> summaryList) {
 
         return """
                 You are a financial assistant.
@@ -192,11 +192,11 @@ public class AiService {
     }
 
 
-    private InsightResponse fallbackInsights(List<CategorySummary> data) {
+    private InsightResponseDTO fallbackInsights(List<CategorySummaryRequestDTO> data) {
 
-        InsightResponse res = new InsightResponse();
+        InsightResponseDTO res = new InsightResponseDTO();
 
-        CategorySummary top = data.stream().max(Comparator.comparing(CategorySummary::getTotalAmount)).orElse(null);
+        CategorySummaryRequestDTO top = data.stream().max(Comparator.comparing(CategorySummaryRequestDTO::getTotalAmount)).orElse(null);
 
         res.setSummary("Basic spending summary generated");
         res.setTopCategory(top != null ? top.getCategory() : "Unknown");

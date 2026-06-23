@@ -8,7 +8,7 @@ import mayur.dev.smartexpensetackerapi.features.auth.dto.LoginRequest;
 import mayur.dev.smartexpensetackerapi.features.auth.dto.RegisterRequest;
 import mayur.dev.smartexpensetackerapi.features.auth.jwt.JwtUtil;
 import mayur.dev.smartexpensetackerapi.features.auth.service.AuthService;
-import mayur.dev.smartexpensetackerapi.features.refreshToken.dto.RefreshRequest;
+import mayur.dev.smartexpensetackerapi.features.refreshToken.dto.RefreshRequestDTO;
 import mayur.dev.smartexpensetackerapi.features.refreshToken.entity.RefreshToken;
 import mayur.dev.smartexpensetackerapi.features.refreshToken.service.RefreshTokenService;
 import mayur.dev.smartexpensetackerapi.features.user.entity.User;
@@ -49,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthResponse>> refresh(@RequestBody RefreshRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(@RequestBody RefreshRequestDTO request) {
 
         RefreshToken refreshToken = refreshTokenService.verifyToken(request.getRefreshToken());
 

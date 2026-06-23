@@ -3,7 +3,7 @@ package mayur.dev.smartexpensetackerapi.features.ai.dto;
 import lombok.Data;
 
 @Data
-public class ExpenseAiResponse {
+public class ExpenseAiResponseDTO {
     private String category;
     private Double amount;
 }
