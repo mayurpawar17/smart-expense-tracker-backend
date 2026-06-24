@@ -7,8 +7,8 @@ import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.Pagination;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponseDTO;
 import mayur.dev.smartexpensetackerapi.features.category.entity.CategoryData;
-import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseRequest;
-import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseResponse;
+import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseRequestDTO;
+import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseResponseDTO;
 import mayur.dev.smartexpensetackerapi.features.expense.service.ExpenseService;
 import mayur.dev.smartexpensetackerapi.features.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -33,20 +33,20 @@ public class ExpenseController {
     // 2. Added @Valid to trigger validation rules
     // 3. Switched to Request/Response DTOs
     @PostMapping
-    public ResponseEntity<ApiResponse<ExpenseResponse>> createExpense(@RequestBody @Valid ExpenseRequest expenseRequest) {
-        ExpenseResponse data = expenseService.createExpense(expenseRequest);
-        ApiResponse<ExpenseResponse> body = ApiResponse.success("Expense created successfully!", data);
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> createExpense(@RequestBody @Valid ExpenseRequestDTO expenseRequestDTO) {
+        ExpenseResponseDTO data = expenseService.createExpense(expenseRequestDTO);
+        ApiResponse<ExpenseResponseDTO> body = ApiResponse.success("Expense created successfully!", data);
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
 
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getExpenses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String category) {
+    public ResponseEntity<ApiResponse<List<ExpenseResponseDTO>>> getExpenses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String category) {
         User user = SecurityUtils.getCurrentUser();
 
-        Page<ExpenseResponse> expensePage = expenseService.getExpenses(user.getId(), category, page, size);
+        Page<ExpenseResponseDTO> expensePage = expenseService.getExpenses(user.getId(), category, page, size);
 
-        Pagination<ExpenseResponse> pagination = new Pagination<>();
+        Pagination<ExpenseResponseDTO> pagination = new Pagination<>();
         pagination.setPage(expensePage.getNumber());
         pagination.setSize(expensePage.getSize());
         pagination.setTotalElements(expensePage.getTotalElements());
@@ -54,7 +54,7 @@ public class ExpenseController {
         pagination.setLast(expensePage.isLast());
 
         var data = expensePage.getContent();
-        ApiResponse<List<ExpenseResponse>> body = ApiResponse.success("Expenses fetched successfully!", data, pagination);
+        ApiResponse<List<ExpenseResponseDTO>> body = ApiResponse.success("Expenses fetched successfully!", data, pagination);
         return ResponseEntity.status(HttpStatus.OK).body(body);
 
     }
@@ -62,7 +62,7 @@ public class ExpenseController {
     @GetMapping("/total")
     public ResponseEntity<ApiResponse<Double>> getTotalExpense() {
         User user = SecurityUtils.getCurrentUser();
-        double data = expenseService.getTotalExpense(user.getId());
+        double data = expenseService.getTotalExpenses(user.getId());
         return ResponseEntity.ok(ApiResponse.success("Retrieved " + data + " total expense", data));
     }
 
@@ -100,8 +100,8 @@ public class ExpenseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExpenseResponse>> updateExpense(@PathVariable Long id, @RequestBody @Valid ExpenseRequest expenseRequest) {
-        ExpenseResponse data = expenseService.updateExpense(id, expenseRequest);
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> updateExpense(@PathVariable Long id, @RequestBody @Valid ExpenseRequestDTO expenseRequestDTO) {
+        ExpenseResponseDTO data = expenseService.updateExpense(id, expenseRequestDTO);
         return ResponseEntity.ok(ApiResponse.success("Expense updated successfully!", data));
     }
 

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @JsonPropertyOrder({"id", "title", "amount", "category", "createdAt"}) // to order the response
-public class ExpenseResponse {
+public class ExpenseResponseDTO {
     private Long id;
     private String title;
 

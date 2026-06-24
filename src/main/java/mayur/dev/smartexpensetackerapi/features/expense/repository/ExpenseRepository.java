@@ -50,7 +50,7 @@ Page<Expense> findByUserIdAndCategoryIgnoreCase(
 
 
     @Query("""
-SELECT new mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummary(e.category, SUM(e.amount))
+SELECT new mayur.dev.smartexpensetackerapi.features.category.dto.CategorySummaryRequestDTO(e.category, SUM(e.amount))
 FROM Expense e
 WHERE e.user.id = :userId
 AND MONTH(e.createdAt) = :month

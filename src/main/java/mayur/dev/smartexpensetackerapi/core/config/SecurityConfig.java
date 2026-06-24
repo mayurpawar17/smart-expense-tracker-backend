@@ -22,31 +22,33 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
-        http.csrf(AbstractHttpConfigurer::disable).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/auth/**").permitAll().anyRequest().authenticated())
 
+        //Disable CSRF because JWT-based APIs do not use browser sessions/cookies
+        http.csrf(AbstractHttpConfigurer::disable);
 
-                //THIS FIXES 401 vs 403 ISSUE
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
-//                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        //Make the application stateless. No server-side sessions will store user state.
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
+        //Define the URL access permissions (The Gatekeeper Rules)
+        //Allow anyone to access authentication routes (login, register, forgot password)
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/api/v1/auth/**").permitAll().requestMatchers("/actuator/health").permitAll().anyRequest().authenticated());
 
-                    ApiResponse<Object> apiResponse = ApiResponse.error("Please login to continue");
+        //Tell Spring how to respond when security checks fail
+        //Triggers when a user tries to access a secured route without logging in (401)
+        //Triggers when a logged-in user tries to access a route they don't have permission for (403)
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            ApiResponse<Object> apiResponse = ApiResponse.error("Please login to continue");
+            response.getWriter().write(mapper.writeValueAsString(apiResponse));
+        }).accessDeniedHandler((request, response, accessDeniedException) -> {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json");
+            ApiResponse<Object> apiResponse = ApiResponse.error("Access denied");
+            response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
+        }));
 
-                    response.getWriter().write(mapper.writeValueAsString(apiResponse));
-                }).accessDeniedHandler((request, response, accessDeniedException) -> {
-
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentType("application/json");
-
-                    ApiResponse<Object> apiResponse = ApiResponse.error("Access denied");
-
-                    response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
-                }))
-
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

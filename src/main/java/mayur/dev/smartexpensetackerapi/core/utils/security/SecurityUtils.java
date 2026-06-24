@@ -8,6 +8,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Objects;
 
+/**
+ * Utility class to interact with Spring Security's thread-local storage context.
+ */
+
+
+/*
+@Slf4j is a lombok annotation, It automatically generates a private static final Logger field (log) for this class at compile time. This allows you to write log.warn() or log.info() without manually declaring a logger instance.
+ */
 @Slf4j
 public class SecurityUtils {
 
@@ -18,6 +26,7 @@ public class SecurityUtils {
 //    }
     public static User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Defensive check: Verify a user token exists and matches our expected custom User instance
         if (auth != null && auth.getPrincipal() instanceof User) {
             return (User) auth.getPrincipal();
         }
