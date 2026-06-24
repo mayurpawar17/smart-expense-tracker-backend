@@ -13,4 +13,7 @@ public interface AiService {
 
     //Generates analytical insights and actionable advice based on historical user expense summaries.
     InsightResponseDTO generateInsights(List<CategorySummaryRequestDTO> summaryList);
+
+    //Generates a short, context-aware description based on an expense title.
+    String generateDescriptionFromTitle(String title);
 }

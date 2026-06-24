@@ -2,6 +2,7 @@ package mayur.dev.smartexpensetackerapi.features.expense.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mayur.dev.smartexpensetackerapi.core.utils.mapper.MapperUtils;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.ExpenseAiResponseDTO;
 import mayur.dev.smartexpensetackerapi.features.ai.dto.InsightResponseDTO;
@@ -28,6 +29,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -49,8 +51,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         try {
             aiResponse = aiService.extractExpense(request.getTitle());
         } catch (Exception e) {
-            // log this (important for debugging)
-            System.out.println("AI failed: " + e.getMessage());
+            log.error("AI failed: " + e.getMessage());
         }
         Expense expense = new Expense();
         expense.setTitle(request.getTitle());
@@ -76,6 +77,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         // This stops Hibernate from running an extra SELECT query on the user table before saving.
         User userProxy = entityManager.getReference(User.class, principal.getId());
         expense.setUser(userProxy);
+
+        // Logical check: If description is null, empty, or just blank spaces
+        if (request.getDescription() == null || request.getDescription().isBlank()) {
+            log.info("Description empty for expense '{}'. Triggering Groq AI generation...", request.getTitle());
+
+            String aiDescription = aiService.generateDescriptionFromTitle(request.getTitle());
+            expense.setDescription(aiDescription);
+        } else {
+            // Use the user's explicit input description
+            expense.setDescription(request.getDescription().trim());
+        }
 
         Expense saved = expenseRepository.save(expense);
         return mapperUtils.mapToExpenseResponse(saved);

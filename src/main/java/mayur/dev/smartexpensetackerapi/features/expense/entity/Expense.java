@@ -22,6 +22,7 @@ public class Expense {
     private String title;
     private BigDecimal amount;
     private String category;
+    private String description;
     private LocalDateTime createdAt;
 
     @ManyToOne

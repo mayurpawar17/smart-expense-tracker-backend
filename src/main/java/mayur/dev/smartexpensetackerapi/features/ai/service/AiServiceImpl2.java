@@ -87,6 +87,38 @@ public class AiServiceImpl2 implements AiService {
         }
     }
 
+    @Override
+    public String generateDescriptionFromTitle(String title) {
+
+        String prompt = """
+            Generate a very short, clean description (maximum 5-7 words) for an expense with the title: "%s".
+            
+            STRICT RULES:
+            - Do NOT include quotes around the output.
+            - Do NOT add explanations or pleasantries.
+            - Provide ONLY the short description sentence.
+            
+            Example Title: Starbucks Coffee
+            Example Output: Handcrafted coffee beverage from Starbucks cafe
+            """.formatted(title);
+
+
+        try {
+            String aiResponse = callGroq(prompt);
+
+            // Clean up any accidental quotes or newlines the LLM might return
+            if (aiResponse != null) {
+                return aiResponse.replace("\"", "").trim();
+            }
+            throw new RuntimeException("Empty response from Groq");
+
+        } catch (Exception e) {
+            log.error("Groq description generation failed for title: {}. Using fallback description.", title, e);
+            // Fallback: Return a sensible generic description based on the title
+            return "Expense recorded for " + title;
+        }
+    }
+
 
     private String callGroq(String prompt) {
         Map<String, Object> message = Map.of("role", "user", "content", prompt);

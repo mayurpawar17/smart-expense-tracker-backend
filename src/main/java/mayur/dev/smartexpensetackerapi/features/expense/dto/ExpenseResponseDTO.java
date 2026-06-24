@@ -21,6 +21,8 @@ public class ExpenseResponseDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "0.00")
     private BigDecimal amount;
     private String category;
+    private String description;
+
 
     // Standardize your date format (ISO 8601 is best practice)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -16,6 +16,7 @@ public class MapperUtils {
         expenseResponseDTO.setTitle(expense.getTitle());
         expenseResponseDTO.setAmount(expense.getAmount());
         expenseResponseDTO.setCategory(expense.getCategory());
+        expenseResponseDTO.setDescription(expense.getDescription());
         expenseResponseDTO.setCreatedAt(expense.getCreatedAt());
         return expenseResponseDTO;
     }

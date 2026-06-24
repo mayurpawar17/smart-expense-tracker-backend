@@ -17,8 +17,10 @@ public class ExpenseRequestDTO {
 //    @Digits(integer = 10, fraction = 2, message = "Amount must be a valid monetary format")
     private BigDecimal amount;
 
+
 //    @NotNull(message = "Category is required")
     private String category;
+    private String description;
 
     @PastOrPresent(message = "Expense date cannot be in the future")
     private LocalDateTime createdAt;
