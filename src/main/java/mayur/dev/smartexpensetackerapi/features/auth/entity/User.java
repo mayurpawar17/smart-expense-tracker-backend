@@ -1,4 +1,4 @@
-package mayur.dev.smartexpensetackerapi.features.user.entity;
+package mayur.dev.smartexpensetackerapi.features.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

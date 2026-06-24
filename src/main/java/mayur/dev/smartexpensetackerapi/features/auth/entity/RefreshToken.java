@@ -1,8 +1,7 @@
-package mayur.dev.smartexpensetackerapi.features.refreshToken.entity;
+package mayur.dev.smartexpensetackerapi.features.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import mayur.dev.smartexpensetackerapi.features.user.entity.User;
 
 import java.time.LocalDateTime;
 

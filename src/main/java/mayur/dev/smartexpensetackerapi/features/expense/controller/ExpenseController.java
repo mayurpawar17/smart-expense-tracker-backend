@@ -10,7 +10,7 @@ import mayur.dev.smartexpensetackerapi.features.category.entity.CategoryData;
 import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseRequestDTO;
 import mayur.dev.smartexpensetackerapi.features.expense.dto.ExpenseResponseDTO;
 import mayur.dev.smartexpensetackerapi.features.expense.service.ExpenseService;
-import mayur.dev.smartexpensetackerapi.features.user.entity.User;
+import mayur.dev.smartexpensetackerapi.features.auth.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

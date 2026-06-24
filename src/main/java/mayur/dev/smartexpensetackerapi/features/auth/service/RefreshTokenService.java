@@ -1,7 +1,7 @@
-package mayur.dev.smartexpensetackerapi.features.refreshToken.service;
+package mayur.dev.smartexpensetackerapi.features.auth.service;
 
-import mayur.dev.smartexpensetackerapi.features.refreshToken.entity.RefreshToken;
-import mayur.dev.smartexpensetackerapi.features.user.entity.User;
+import mayur.dev.smartexpensetackerapi.features.auth.entity.RefreshToken;
+import mayur.dev.smartexpensetackerapi.features.auth.entity.User;
 
 public interface RefreshTokenService {
 

@@ -2,7 +2,7 @@ package mayur.dev.smartexpensetackerapi.features.expense.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import mayur.dev.smartexpensetackerapi.features.user.entity.User;
+import mayur.dev.smartexpensetackerapi.features.auth.entity.User;
 
 import java.math.BigDecimal;
 import java.time.*;

@@ -1,4 +1,4 @@
-package mayur.dev.smartexpensetackerapi.features.refreshToken.dto;
+package mayur.dev.smartexpensetackerapi.features.auth.dto;
 
 import lombok.Getter;
 import lombok.Setter;

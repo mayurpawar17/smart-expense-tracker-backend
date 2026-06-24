@@ -3,6 +3,8 @@ spring:
     name: smart-expense-tacker-api
 
   datasource:
+    hikari:
+      max-lifetime: 900000 # 15 minutes in milliseconds
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}

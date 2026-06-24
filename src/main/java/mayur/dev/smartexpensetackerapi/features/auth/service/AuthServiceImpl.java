@@ -6,10 +6,9 @@ import mayur.dev.smartexpensetackerapi.features.auth.dto.AuthResponseDTO;
 import mayur.dev.smartexpensetackerapi.features.auth.dto.LoginRequestDTO;
 import mayur.dev.smartexpensetackerapi.features.auth.dto.RegisterRequestDTO;
 import mayur.dev.smartexpensetackerapi.features.auth.jwt.JwtUtil;
-import mayur.dev.smartexpensetackerapi.features.refreshToken.entity.RefreshToken;
-import mayur.dev.smartexpensetackerapi.features.refreshToken.service.RefreshTokenServiceImpl;
-import mayur.dev.smartexpensetackerapi.features.user.entity.User;
-import mayur.dev.smartexpensetackerapi.features.user.repository.UserRepository;
+import mayur.dev.smartexpensetackerapi.features.auth.entity.RefreshToken;
+import mayur.dev.smartexpensetackerapi.features.auth.entity.User;
+import mayur.dev.smartexpensetackerapi.features.auth.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
