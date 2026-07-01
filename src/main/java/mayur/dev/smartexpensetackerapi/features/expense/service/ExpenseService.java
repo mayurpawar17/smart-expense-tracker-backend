@@ -13,7 +13,9 @@ public interface ExpenseService {
 
     ExpenseResponseDTO createExpense(ExpenseRequestDTO request);
 
-    Page<ExpenseResponseDTO> getExpenses(Long userId, String category, int page, int size);
+    Page<ExpenseResponseDTO> getExpenses(Long userId, String search, String category, int page, int size);
+
+    ExpenseResponseDTO getExpenseById(Long id);
 
     Double getTotalExpenses(Long userId);
 

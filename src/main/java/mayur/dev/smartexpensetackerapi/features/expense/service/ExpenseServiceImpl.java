@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +43,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     ExpenseAiResponseDTO aiResponse = null;
 
 
+    //create new expense
     @Override
     public ExpenseResponseDTO createExpense(ExpenseRequestDTO request) {
         User principal = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
@@ -94,10 +96,11 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public Page<ExpenseResponseDTO> getExpenses(Long userId, String category, int page, int size) {
+    public Page<ExpenseResponseDTO> getExpenses(Long userId, String search, String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Page<Expense> expensePage;
+
 
         if (category != null && !category.isBlank()) {
             expensePage = expenseRepository.findByUserIdAndCategoryIgnoreCase(userId, category, pageable);
@@ -106,6 +109,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         return expensePage.map(mapperUtils::mapToExpenseResponse);
+    }
+
+    @Override
+    public ExpenseResponseDTO getExpenseById(Long id) {
+        Optional<Expense> expense = expenseRepository.findById(id);
+        return mapperUtils.mapToExpenseResponse(expense.get());
     }
 
     @Override

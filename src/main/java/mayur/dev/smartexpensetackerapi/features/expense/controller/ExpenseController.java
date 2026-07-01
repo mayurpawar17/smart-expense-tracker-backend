@@ -29,6 +29,7 @@ public class ExpenseController {
 
     private final ExpenseService expenseService;
 
+
     // 1. Added @ResponseStatus(HttpStatus.CREATED)
     // 2. Added @Valid to trigger validation rules
     // 3. Switched to Request/Response DTOs
@@ -37,14 +38,13 @@ public class ExpenseController {
         ExpenseResponseDTO data = expenseService.createExpense(expenseRequestDTO);
         ApiResponse<ExpenseResponseDTO> body = ApiResponse.success("Expense created successfully!", data);
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
-
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ExpenseResponseDTO>>> getExpenses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String category) {
+    public ResponseEntity<ApiResponse<List<ExpenseResponseDTO>>> getExpenses(@RequestParam(required = false) String search, @RequestParam(required = false) String category, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         User user = SecurityUtils.getCurrentUser();
 
-        Page<ExpenseResponseDTO> expensePage = expenseService.getExpenses(user.getId(), category, page, size);
+        Page<ExpenseResponseDTO> expensePage = expenseService.getExpenses(user.getId(), search, category, page, size);
 
         Pagination<ExpenseResponseDTO> pagination = new Pagination<>();
         pagination.setPage(expensePage.getNumber());
@@ -57,6 +57,12 @@ public class ExpenseController {
         ApiResponse<List<ExpenseResponseDTO>> body = ApiResponse.success("Expenses fetched successfully!", data, pagination);
         return ResponseEntity.status(HttpStatus.OK).body(body);
 
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> getExpenseById(@PathVariable Long id) {
+        var expenseResponseDTO = expenseService.getExpenseById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("Expense fetched successfully!", expenseResponseDTO));
     }
 
     @GetMapping("/total")
